@@ -1,6 +1,7 @@
 ﻿using Firstwebapi.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Firstwebapi.Controllers
 {
@@ -13,11 +14,24 @@ namespace Firstwebapi.Controllers
         {
             _repositoryEmployee = repository;
         }
-        [HttpGet("/ListAllEmployees")]
-        public List<Employee> ListAllEmployees()
+        [HttpGet("/GetAllEmployees")]
+        public IEnumerable<EmpViewModel> GetAllEmployees()
         {
-            List<Employee> employeesList = _repositoryEmployee.AllEmployees();
-            return employeesList;
+            List<Employee> employees = _repositoryEmployee.AllEmployees();
+            var empList=(
+                from emp in employees
+                select new EmpViewModel()
+                {
+                    EmpId= emp.EmployeeId,
+                    FirstName= emp.FirstName,
+                    LastName= emp.LastName,
+                    BirthDate= emp.BirthDate,
+                    HireDate=  emp.HireDate,
+                    Title=emp.Title,
+                    City= emp.City,
+                    ReportsTo=emp.ReportsTo
+                }).ToList();    
+            return empList;
         }
         [HttpGet("/FindEmployee")]
         public Employee FindEmployee(int id)
@@ -38,12 +52,19 @@ namespace Firstwebapi.Controllers
                 return "Employee Added To Database";
             }
         }
-        [HttpGet("/ModifyEmployee")]
-        public int ModifyEmployee(int id)
+        [HttpPut]
+        public Employee EditEmployee(int id, [FromBody] Employee updatedEmployee)
         {
-            int employeestatus = _repositoryEmployee.ModifyEmployee(id);
-            return employeestatus;
+
+            updatedEmployee.EmployeeId = id; // Ensure the ID in the URL matches the EmployeeId
+
+
+
+            Employee savedEmployee = _repositoryEmployee.UpdateEmployee(updatedEmployee);
+            return savedEmployee;
         }
+        
+        
         [HttpGet("/DeleteEmployee")]
         public string DeleteEmployee(int id)
         {

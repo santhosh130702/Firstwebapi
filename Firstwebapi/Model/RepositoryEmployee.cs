@@ -21,11 +21,13 @@
             _context.Employees.Add(newEmployee);
             return _context.SaveChanges();
         }
-        public int ModifyEmployee(int id)
+
+        public Employee UpdateEmployee(Employee updatedEmployee)
         {
-            Employee emp = _context.Employees.Find(id);
-            _context.Employees.Update(emp);
-            return _context.SaveChanges();
+            _context.Employees.Update(updatedEmployee);
+            // Console.WriteLine(_context.Entry(updatedEmployee).State); // sir,i will do it , thankyou sir
+            _context.SaveChanges();
+            return updatedEmployee;
         }
         public int DeleteEmployee(int id)
         {
